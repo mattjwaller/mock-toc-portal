@@ -1,0 +1,19 @@
+name: CI
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint && npm run test:ci
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    uses: railwayapp/railway-github-action@v3
+    with:
+      railwayToken: ${{ secrets.RAILWAY_TOKEN }}
