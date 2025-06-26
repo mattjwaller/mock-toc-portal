@@ -37,6 +37,17 @@ process.on('SIGTERM', async () => {
   process.exit(0);
 });
 
+// Unhandled error handlers
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
@@ -65,6 +76,16 @@ app.use('/api', authMiddleware);
 app.use('/api/incidents', incidentsRouter(prisma));
 app.use('/api', supportingRouter(prisma));
 
+// Simple health check that doesn't require database
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 app.get('/healthz', async (req, res) => {
   try {
     // Test database connection for health check
@@ -76,11 +97,6 @@ app.get('/healthz', async (req, res) => {
   }
 });
 
-// Simple health check that doesn't require database
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
 const collectDefaultMetrics = promClient.collectDefaultMetrics;
 collectDefaultMetrics();
 app.get('/metrics', async (req, res) => {
@@ -88,11 +104,14 @@ app.get('/metrics', async (req, res) => {
   res.end(await promClient.register.metrics());
 });
 
-const port = process.env.PORT || 8080;
+const port = parseInt(process.env.PORT || '8080', 10);
 
 // Start server with database connection check
 async function startServer() {
   console.log('🚀 Starting TOC Portal server...');
+  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📊 Port: ${port}`);
+  console.log(`📊 Database URL: ${process.env.DATABASE_URL ? 'Set' : 'Not set'}`);
   
   // Test database connection
   const dbConnected = await testDatabaseConnection();
@@ -100,10 +119,20 @@ async function startServer() {
     console.error('❌ Failed to connect to database. Server will start but may not function properly.');
   }
   
-  app.listen(port, () => {
+  const server = app.listen(port, '0.0.0.0', () => {
     console.log(`✅ Server running on port ${port}`);
-    console.log(`📊 Health check available at http://localhost:${port}/healthz`);
+    console.log(`📊 Health check available at http://localhost:${port}/health`);
     console.log(`📈 Metrics available at http://localhost:${port}/metrics`);
+    console.log(`🔍 Database health check available at http://localhost:${port}/healthz`);
+  });
+
+  // Handle server errors
+  server.on('error', (error: NodeJS.ErrnoException) => {
+    console.error('❌ Server error:', error);
+    if (error.code === 'EADDRINUSE') {
+      console.error(`❌ Port ${port} is already in use`);
+    }
+    process.exit(1);
   });
 }
 
