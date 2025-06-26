@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { IncidentService } from '../services/incidents';
-import { requireViewer, requireEditor, requireAdmin } from '../auth';
+import { IncidentService } from '../services/incidents.js';
+import { requireViewer, requireEditor, requireAdmin } from '../auth.js';
 
 export default function incidentsRouter(prisma: PrismaClient) {
   const router = Router();

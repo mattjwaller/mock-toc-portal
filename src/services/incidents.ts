@@ -1,5 +1,5 @@
 import { PrismaClient, Incident } from '@prisma/client';
-import { incidentCreateSchema, incidentUpdateSchema, commentSchema, bulkActionSchema } from '../api/validators/incident';
+import { incidentCreateSchema, incidentUpdateSchema, commentSchema, bulkActionSchema } from '../api/validators/incident.js';
 
 export class IncidentService {
   constructor(private prisma: PrismaClient) {}

@@ -1,10 +1,10 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import incidentsRouter from './api/incidents';
-import webhooksRouter from './api/webhooks';
-import supportingRouter from './api/supporting';
+import incidentsRouter from './api/incidents.js';
+import webhooksRouter from './api/webhooks.js';
+import supportingRouter from './api/supporting.js';
 import promClient from 'prom-client';
-import { authMiddleware } from './auth';
+import { authMiddleware } from './auth.js';
 
 const app = express();
 const prisma = new PrismaClient();

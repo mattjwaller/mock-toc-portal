@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { IncidentService } from '../services/incidents';
+import { IncidentService } from '../services/incidents.js';
 import { z } from 'zod';
 
 const webhookSchema = z.object({

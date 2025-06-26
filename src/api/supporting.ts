@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { requireViewer } from '../auth';
+import { requireViewer } from '../auth.js';
 
 export default function supportingRouter(prisma: PrismaClient) {
   const router = Router();
