@@ -14,6 +14,20 @@ export default function incidentsRouter(prisma: PrismaClient) {
       const sortBy = String(req.query.sortBy || 'createdAt');
       const sortOrder = String(req.query.sortOrder || 'desc') as 'asc' | 'desc';
       
+      // Validate sort field
+      const validSortFields = [
+        'createdAt', 'updatedAt', 'title', 'status', 'priority', 
+        'severityLevel', 'customerId', 'siteId', 'assignedToId'
+      ];
+      
+      if (!validSortFields.includes(sortBy)) {
+        return res.status(400).json({ 
+          error: `Invalid sort field: ${sortBy}`,
+          validFields: validSortFields,
+          receivedField: sortBy
+        });
+      }
+      
       console.log('🔍 Fetching incidents with params:', {
         limit,
         offset,

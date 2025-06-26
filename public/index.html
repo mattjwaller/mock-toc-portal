@@ -203,7 +203,7 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="priority">
                     Priority <i class="fas fa-sort ml-1"></i>
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="severity">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="severityLevel">
                     Severity <i class="fas fa-sort ml-1"></i>
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -1128,6 +1128,34 @@
 
     // Make database test function available globally
     window.testDatabase = testDatabase;
+
+    // Function to test incidents endpoint
+    async function testIncidents() {
+      try {
+        console.log('🧪 Testing incidents endpoint...');
+        
+        // Test with valid sort field
+        const response = await fetch('/api/incidents?sortBy=severityLevel&sortOrder=desc', {
+          headers: authManager.getAuthHeaders()
+        });
+        
+        if (response.ok) {
+          const incidents = await response.json();
+          console.log(`✅ Incidents endpoint works! Found ${incidents.length} incidents`);
+          alert(`✅ Incidents endpoint works!\nFound ${incidents.length} incidents`);
+        } else {
+          const error = await response.json();
+          console.error('❌ Incidents endpoint failed:', error);
+          alert(`❌ Incidents endpoint failed:\n${error.error || 'Unknown error'}`);
+        }
+      } catch (error) {
+        console.error('❌ Test incidents error:', error);
+        alert('Test failed: ' + error.message);
+      }
+    }
+
+    // Make incidents test function available globally
+    window.testIncidents = testIncidents;
   </script>
 </body>
 </html>
