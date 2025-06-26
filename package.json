@@ -12,6 +12,7 @@
     "migrate:dev": "npx prisma migrate dev",
     "db:seed": "npx prisma db seed",
     "db:push": "npx prisma db push",
+    "seed:railway": "node scripts/seed-railway.js",
     "test:startup": "node scripts/test-startup.js",
     "lint": "eslint .",
     "seed": "ts-node prisma/seed.ts",
@@ -40,6 +41,6 @@
     "typescript": "^5.2.2"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "node prisma/seed.js"
   }
 }
