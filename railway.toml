@@ -2,11 +2,11 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "npx prisma migrate deploy && npm start"
-healthcheckPath = "/healthz"
-healthcheckTimeout = 300
+startCommand = "./scripts/start.sh"
+healthcheckPath = "/health"
+healthcheckTimeout = 600
 restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 3
+restartPolicyMaxRetries = 5
 
 [deploy.envs]
 NODE_ENV = "production" 
