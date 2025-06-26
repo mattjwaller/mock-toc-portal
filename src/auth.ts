@@ -53,9 +53,10 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
     const decoded = jwt.verify(token, secret) as SupabaseJWTPayload;
     
     // Extract user information from Supabase JWT
+    // Give all authenticated users admin access
     const user: User = {
       id: decoded.sub,
-      role: (decoded.user_metadata?.role as User['role']) || 'viewer' // Default to viewer if no role specified
+      role: 'admin' // All authenticated users get admin access
     };
     
     req.user = user;
@@ -66,14 +67,13 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
   }
 }
 
+// All role functions now just check if user is authenticated
 export function requireRole(roles: User['role'][]) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
     }
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'Insufficient permissions' });
-    }
+    // All authenticated users have access
     next();
   };
 }

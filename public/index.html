@@ -1048,48 +1048,6 @@
     // Make debug function available globally
     window.debugAuth = debugAuth;
 
-    // User role management functions
-    async function setCurrentUserRole(role) {
-      if (!authManager.isAuthenticated()) {
-        alert('Please log in first');
-        return false;
-      }
-
-      const user = authManager.getCurrentUser();
-      console.log(`🔄 Setting role for current user (${user.email}) to ${role}...`);
-      
-      try {
-        const response = await fetch(`${getConfig('SUPABASE_URL')}/rest/v1/auth/users/${user.id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': getConfig('SUPABASE_ANON_KEY'),
-            'Authorization': `Bearer ${authManager.token}`
-          },
-          body: JSON.stringify({
-            user_metadata: { role: role }
-          })
-        });
-
-        if (response.ok) {
-          console.log(`✅ User ${user.id} role set to ${role}`);
-          alert(`Role set to ${role} successfully! Please refresh the page.`);
-          return true;
-        } else {
-          console.error(`❌ Failed to set role for user ${user.id}:`, await response.text());
-          alert('Failed to set role. Check console for details.');
-          return false;
-        }
-      } catch (error) {
-        console.error(`❌ Error setting role for user ${user.id}:`, error);
-        alert('Error setting role: ' + error.message);
-        return false;
-      }
-    }
-
-    // Make role function available globally
-    window.setCurrentUserRole = setCurrentUserRole;
-
     // Simple function to test auth debug endpoint
     async function testAuthDebug() {
       try {
