@@ -1083,6 +1083,51 @@
 
     // Make test function available globally
     window.testAuthDebug = testAuthDebug;
+
+    // Function to test database connection
+    async function testDatabase() {
+      try {
+        const response = await fetch('/api/debug/db');
+        
+        const debugInfo = await response.json();
+        console.log('🔍 Database Debug Info:', debugInfo);
+        
+        let message = 'Database Debug Info:\n';
+        message += `Prisma: ${debugInfo.hasPrisma}\n`;
+        message += `Database URL: ${debugInfo.hasDatabaseUrl}\n`;
+        message += `Connection: ${debugInfo.connection || 'unknown'}\n`;
+        
+        if (debugInfo.incidentTable) {
+          message += `Incident Table: ${debugInfo.incidentTable}\n`;
+          if (debugInfo.incidentCount !== undefined) {
+            message += `Incident Count: ${debugInfo.incidentCount}\n`;
+          }
+        }
+        
+        if (debugInfo.customerTable) {
+          message += `Customer Table: ${debugInfo.customerTable}\n`;
+          if (debugInfo.customerCount !== undefined) {
+            message += `Customer Count: ${debugInfo.customerCount}\n`;
+          }
+        }
+        
+        if (debugInfo.connectionError) {
+          message += `Connection Error: ${debugInfo.connectionError}\n`;
+        }
+        
+        if (debugInfo.incidentError) {
+          message += `Incident Table Error: ${debugInfo.incidentError}\n`;
+        }
+        
+        alert(message);
+      } catch (error) {
+        console.error('Test database error:', error);
+        alert('Test failed: ' + error.message);
+      }
+    }
+
+    // Make database test function available globally
+    window.testDatabase = testDatabase;
   </script>
 </body>
 </html>

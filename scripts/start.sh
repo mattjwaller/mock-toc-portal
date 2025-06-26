@@ -23,11 +23,22 @@ npx prisma generate || {
 
 echo "✅ Prisma client generated successfully"
 
-# Try to run migrations, but don't fail if they don't work
-echo "📊 Running database migrations..."
-npx prisma migrate deploy --schema=./prisma/schema.prisma || {
-    echo "⚠️  Database migrations failed, but continuing..."
-    echo "💡 You may need to run migrations manually later"
+# Create database tables if they don't exist
+echo "📊 Creating database tables..."
+npx prisma db push --accept-data-loss || {
+    echo "⚠️  Database push failed, trying migrate deploy..."
+    npx prisma migrate deploy --schema=./prisma/schema.prisma || {
+        echo "❌ Database setup failed"
+        exit 1
+    }
+}
+
+echo "✅ Database tables created successfully"
+
+# Seed the database with sample data (optional)
+echo "🌱 Seeding database with sample data..."
+npx prisma db seed || {
+    echo "⚠️  Database seeding failed, but continuing..."
 }
 
 echo "🚀 Starting server..."

@@ -24,6 +24,27 @@ async function testDatabaseConnection() {
   }
 }
 
+// Create database tables if they don't exist
+async function ensureDatabaseTables() {
+  try {
+    console.log('📊 Ensuring database tables exist...');
+    
+    // Try to create tables using db push
+    const { execSync } = await import('child_process');
+    execSync('npx prisma db push --accept-data-loss', { 
+      stdio: 'inherit',
+      env: process.env 
+    });
+    
+    console.log('✅ Database tables created/updated successfully');
+    return true;
+  } catch (error) {
+    console.error('⚠️  Database table creation failed:', error);
+    console.log('💡 Tables may already exist or there may be a connection issue');
+    return false;
+  }
+}
+
 // Graceful shutdown
 process.on('SIGINT', async () => {
   console.log('Shutting down gracefully...');
@@ -117,6 +138,9 @@ async function startServer() {
   const dbConnected = await testDatabaseConnection();
   if (!dbConnected) {
     console.error('❌ Failed to connect to database. Server will start but may not function properly.');
+  } else {
+    // Try to create tables if connection is successful
+    await ensureDatabaseTables();
   }
   
   const server = app.listen(port, '0.0.0.0', () => {

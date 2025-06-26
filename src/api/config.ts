@@ -48,5 +48,56 @@ export default function configRouter() {
     res.json(debugInfo);
   });
 
+  // Database test endpoint
+  router.get('/debug/db', async (req: Request, res: Response) => {
+    try {
+      const { PrismaClient } = await import('@prisma/client');
+      const prisma = new PrismaClient();
+      
+      const debugInfo: any = {
+        hasPrisma: true,
+        hasDatabaseUrl: !!process.env.DATABASE_URL,
+        databaseUrlLength: process.env.DATABASE_URL?.length || 0,
+      };
+
+      try {
+        // Test database connection
+        await prisma.$connect();
+        debugInfo.connection = 'success';
+        
+        // Test if tables exist
+        try {
+          const incidentCount = await prisma.incident.count();
+          debugInfo.incidentTable = 'exists';
+          debugInfo.incidentCount = incidentCount;
+        } catch (error) {
+          debugInfo.incidentTable = 'missing';
+          debugInfo.incidentError = error instanceof Error ? error.message : 'Unknown error';
+        }
+
+        try {
+          const customerCount = await prisma.customer.count();
+          debugInfo.customerTable = 'exists';
+          debugInfo.customerCount = customerCount;
+        } catch (error) {
+          debugInfo.customerTable = 'missing';
+          debugInfo.customerError = error instanceof Error ? error.message : 'Unknown error';
+        }
+
+        await prisma.$disconnect();
+      } catch (error) {
+        debugInfo.connection = 'failed';
+        debugInfo.connectionError = error instanceof Error ? error.message : 'Unknown error';
+      }
+
+      res.json(debugInfo);
+    } catch (error) {
+      res.json({
+        hasPrisma: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   return router;
 } 

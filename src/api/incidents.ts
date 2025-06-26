@@ -13,6 +13,21 @@ export default function incidentsRouter(prisma: PrismaClient) {
       const offset = parseInt(String(req.query.offset || '0'), 10);
       const sortBy = String(req.query.sortBy || 'createdAt');
       const sortOrder = String(req.query.sortOrder || 'desc') as 'asc' | 'desc';
+      
+      console.log('🔍 Fetching incidents with params:', {
+        limit,
+        offset,
+        sortBy,
+        sortOrder,
+        status: req.query.status,
+        priority: req.query.priority,
+        severityLevel: req.query.severityLevel,
+        customerId: req.query.customerId,
+        siteId: req.query.siteId,
+        tags: req.query.tags,
+        search: req.query.search,
+      });
+
       const incidents = await service.list({
         limit,
         offset,
@@ -26,9 +41,17 @@ export default function incidentsRouter(prisma: PrismaClient) {
         tags: typeof req.query.tags === 'string' ? String(req.query.tags).split(',') : undefined,
         search: req.query.search as string | undefined,
       });
+      
+      console.log(`✅ Found ${incidents.length} incidents`);
       res.json(incidents);
     } catch (err: any) {
-      res.status(400).json({ error: err.message });
+      console.error('❌ Error fetching incidents:', err);
+      console.error('❌ Error stack:', err.stack);
+      res.status(400).json({ 
+        error: err.message,
+        details: err.stack,
+        type: err.constructor.name
+      });
     }
   });
 
