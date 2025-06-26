@@ -13,6 +13,7 @@ model Customer {
   id        String   @id @default(uuid())
   name      String
   sites     Site[]
+  incidents Incident[]
   createdAt DateTime @default(now())
 }
 
@@ -22,6 +23,7 @@ model Site {
   customerId String
   chargers   Charger[]
   customer   Customer @relation(fields: [customerId], references: [id])
+  incidents  Incident[]
   createdAt  DateTime @default(now())
 }
 

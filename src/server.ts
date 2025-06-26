@@ -1,6 +1,8 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import incidentsRouter from './api/incidents';
+import webhooksRouter from './api/webhooks';
+import supportingRouter from './api/supporting';
 import promClient from 'prom-client';
 import { authMiddleware } from './auth';
 
@@ -22,9 +24,15 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
-app.use(authMiddleware);
 app.use(express.static('public'));
+
+// Webhook endpoints (no auth required)
+app.use('/webhooks', webhooksRouter(prisma));
+
+// Protected API endpoints
+app.use('/api', authMiddleware);
 app.use('/api/incidents', incidentsRouter(prisma));
+app.use('/api', supportingRouter(prisma));
 
 app.get('/healthz', (req, res) => res.json({ status: 'ok' }));
 

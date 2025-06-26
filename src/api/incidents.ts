@@ -1,12 +1,13 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { IncidentService } from '../services/incidents';
+import { requireViewer, requireEditor, requireAdmin } from '../auth';
 
 export default function incidentsRouter(prisma: PrismaClient) {
   const router = Router();
   const service = new IncidentService(prisma);
 
-  router.get('/', async (req: Request, res: Response) => {
+  router.get('/', requireViewer(), async (req: Request, res: Response) => {
     try {
       const limit = parseInt(String(req.query.limit || '50'), 10);
       const offset = parseInt(String(req.query.offset || '0'), 10);
@@ -31,7 +32,7 @@ export default function incidentsRouter(prisma: PrismaClient) {
     }
   });
 
-  router.post('/', async (req: Request, res: Response) => {
+  router.post('/', requireEditor(), async (req: Request, res: Response) => {
     try {
       const incident = await service.create(req.body, req.user?.id);
       res.status(201).json(incident);
@@ -40,7 +41,7 @@ export default function incidentsRouter(prisma: PrismaClient) {
     }
   });
 
-  router.get('/:id', async (req: Request, res: Response) => {
+  router.get('/:id', requireViewer(), async (req: Request, res: Response) => {
     const incident = await prisma.incident.findUnique({
       where: { id: req.params.id },
       include: { timeline: true, chargers: true },
@@ -49,7 +50,7 @@ export default function incidentsRouter(prisma: PrismaClient) {
     res.json(incident);
   });
 
-  router.patch('/:id', async (req: Request, res: Response) => {
+  router.patch('/:id', requireEditor(), async (req: Request, res: Response) => {
     try {
       const incident = await service.update(req.params.id, req.body);
       res.json(incident);
@@ -58,7 +59,7 @@ export default function incidentsRouter(prisma: PrismaClient) {
     }
   });
 
-  router.post('/:id/comment', async (req: Request, res: Response) => {
+  router.post('/:id/comment', requireEditor(), async (req: Request, res: Response) => {
     try {
       const userId = req.user?.id as string;
       const event = await service.addComment(req.params.id, userId, req.body);
@@ -68,7 +69,7 @@ export default function incidentsRouter(prisma: PrismaClient) {
     }
   });
 
-  router.post('/bulk', async (req: Request, res: Response) => {
+  router.post('/bulk', requireEditor(), async (req: Request, res: Response) => {
     try {
       const result = await service.bulkAction(req.body);
       res.json(result);
