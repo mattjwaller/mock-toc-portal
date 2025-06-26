@@ -1,0 +1,98 @@
+// Prisma schema for Incident & Ticketing Portal
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  name      String
+  sites     Site[]
+  createdAt DateTime @default(now())
+}
+
+model Site {
+  id         String   @id @default(uuid())
+  name       String
+  customerId String
+  chargers   Charger[]
+  customer   Customer @relation(fields: [customerId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+model Charger {
+  id        String   @id @default(uuid())
+  identifier String  @unique
+  siteId    String
+  site      Site     @relation(fields: [siteId], references: [id])
+  incidents Incident[]
+  createdAt DateTime @default(now())
+}
+
+model Incident {
+  id            String            @id @default(uuid())
+  title         String
+  description   String?
+  status        IncidentStatus    @default(OPEN)
+  priority      IncidentPriority  @default(MEDIUM)
+  source        IncidentSource
+  tags          Json              @default("[]")
+
+  severityLevel SeverityLevel?
+  faultReported String?
+  rootCause     String?
+  actionTaken   String?
+  inScope       Boolean?
+
+  customerId   String?
+  customer     Customer? @relation(fields: [customerId], references: [id])
+  siteId       String?
+  site         Site?     @relation(fields: [siteId], references: [id])
+  chargers     Charger[]
+  assignedToId String?
+  timeline     TimelineEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum IncidentStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+enum IncidentPriority {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum IncidentSource {
+  MANUAL
+  IMPORTED
+}
+
+enum SeverityLevel {
+  SEV0
+  SEV1
+  SEV1A
+  SEV2
+  SEV3
+}
+
+model TimelineEvent {
+  id         String   @id @default(uuid())
+  incidentId String
+  authorId   String?
+  type       String
+  payload    Json
+  createdAt  DateTime @default(now())
+  Incident   Incident @relation(fields: [incidentId], references: [id])
+}

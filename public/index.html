@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Incidents</title>
+  <style>
+    body { font-family: sans-serif; margin: 2em; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; }
+  </style>
+</head>
+<body>
+  <h1>Incidents</h1>
+  <div>
+    <input id="search" placeholder="search" />
+    <input id="tag" placeholder="tag" />
+    <select id="status">
+      <option value="">any status</option>
+      <option value="OPEN">Open</option>
+      <option value="ACKNOWLEDGED">Acknowledged</option>
+      <option value="RESOLVED">Resolved</option>
+    </select>
+    <button onclick="load()">Search</button>
+  </div>
+  <table id="list"></table>
+
+  <h2>Create Incident</h2>
+  <form id="createForm" onsubmit="createIncident(); return false;">
+    <input name="title" placeholder="title" required />
+    <select name="priority">
+      <option value="CRITICAL">Critical</option>
+      <option value="HIGH">High</option>
+      <option value="MEDIUM" selected>Medium</option>
+      <option value="LOW">Low</option>
+    </select>
+    <button type="submit">Create</button>
+  </form>
+
+  <script>
+    async function load() {
+      const q = document.getElementById('search').value;
+      const tag = document.getElementById('tag').value;
+      const status = document.getElementById('status').value;
+      const params = new URLSearchParams();
+      if (q) params.set('search', q);
+      if (tag) params.set('tags', tag);
+      if (status) params.set('status', status);
+      const resp = await fetch('/api/incidents?' + params.toString());
+      const data = await resp.json();
+      const table = document.getElementById('list');
+      table.innerHTML = `<tr><th>ID</th><th>Title</th><th>Status</th><th>Severity</th></tr>` +
+        data.map(i => `<tr><td>${i.id}</td><td>${i.title}</td><td>${i.status}</td><td>${i.severityLevel || ''}</td></tr>`).join('');
+    }
+    async function createIncident() {
+      const form = document.getElementById('createForm');
+      const formData = new FormData(form);
+      const payload = { title: formData.get('title'), priority: formData.get('priority'), source: 'MANUAL' };
+      await fetch('/api/incidents', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      form.reset();
+      load();
+    }
+    load();
+  </script>
+</body>
+</html>
