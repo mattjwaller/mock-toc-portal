@@ -7,41 +7,95 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    .modal { display: none; }
-    .modal.active { display: flex; }
-    .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
-    .sidebar.open { transform: translateX(0); }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
+    .modal { 
+      display: none; 
+      opacity: 0;
+      transform: scale(0.95);
+      transition: all 0.3s ease;
+    }
+    .modal.active { 
+      display: flex; 
+      opacity: 1;
+      transform: scale(1);
+    }
+    .sidebar { 
+      transform: translateX(-100%); 
+      transition: transform 0.3s ease; 
+    }
+    .sidebar.open { 
+      transform: translateX(0); 
+    }
+    .tab-content { 
+      display: none; 
+    }
+    .tab-content.active { 
+      display: block; 
+    }
+    
+    /* Enhanced table styling */
+    .incident-table tbody tr:nth-child(even) {
+      background-color: #f9fafb;
+    }
+    .incident-table tbody tr:hover {
+      background-color: #f3f4f6;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+    }
+    
+    /* Enhanced badge styling */
+    .status-badge {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+    }
+    .status-badge:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Button hover effects */
+    .btn-hover {
+      transition: all 0.2s ease;
+    }
+    .btn-hover:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
   </style>
 </head>
 <body class="bg-gray-50">
   <!-- Login Modal -->
-  <div id="loginModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+  <div id="loginModal" class="modal fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 backdrop-blur-sm">
+    <div class="relative top-20 mx-auto p-8 border w-96 shadow-2xl rounded-xl bg-gradient-to-br from-white to-gray-50 transform transition-all duration-300 scale-95 opacity-0">
       <div class="mt-3">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-medium text-gray-900">Login to TOC Portal</h3>
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-2xl font-bold text-gray-900">Welcome Back</h3>
         </div>
         
-        <form id="loginForm" class="space-y-4">
+        <form id="loginForm" class="space-y-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" name="email" required 
-                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+            <div class="relative">
+              <i class="fas fa-envelope absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              <input type="email" name="email" required 
+                     class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+            </div>
           </div>
           
           <div>
-            <label class="block text-sm font-medium text-gray-700">Password</label>
-            <input type="password" name="password" required 
-                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+            <div class="relative">
+              <i class="fas fa-lock absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              <input type="password" name="password" required 
+                     class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+            </div>
           </div>
 
-          <div id="loginError" class="text-red-600 text-sm hidden"></div>
+          <div id="loginError" class="text-red-600 text-sm hidden bg-red-50 border border-red-200 rounded-lg p-3"></div>
 
-          <div class="flex justify-end space-x-3 pt-4">
-            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
-              Login
+          <div class="flex justify-end pt-4">
+            <button type="submit" class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-6 py-3 rounded-lg hover:from-indigo-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 font-semibold transition-all duration-200 transform hover:scale-105">
+              <i class="fas fa-sign-in-alt mr-2"></i>Sign In
             </button>
           </div>
         </form>
@@ -50,25 +104,23 @@
   </div>
 
   <!-- Navigation Bar -->
-  <nav class="bg-white shadow-sm border-b">
+  <nav class="bg-white shadow-md border-b sticky top-0 z-40 transition-shadow">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
+      <div class="flex justify-between h-16 items-center">
         <div class="flex items-center">
-          <h1 class="text-xl font-semibold text-gray-900">TOC Portal</h1>
+          <h1 class="text-2xl font-bold text-indigo-700 tracking-tight">TOC Portal</h1>
           <div class="ml-8 flex space-x-4">
-            <button id="savedFiltersBtn" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
-              <i class="fas fa-bookmark mr-1"></i>Saved Filters
+            <button id="savedFiltersBtn" class="flex items-center text-gray-500 hover:text-indigo-700 px-3 py-2 text-sm font-medium transition-colors">
+              <i class="fas fa-bookmark mr-2"></i><span>Saved Filters</span>
             </button>
           </div>
         </div>
         <div class="flex items-center space-x-4">
-          <div class="relative">
-            <button id="userMenuBtn" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              <span id="userName" class="text-gray-700 mr-2">Not logged in</span>
-              <span id="userRole" class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">Guest</span>
-            </button>
-            <button id="logoutBtn" class="ml-2 text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium hidden">
-              <i class="fas fa-sign-out-alt mr-1"></i>Logout
+          <div class="flex items-center bg-gray-100 rounded-full px-3 py-1">
+            <span id="userName" class="text-gray-700 font-medium mr-2">Not logged in</span>
+            <span id="userRole" class="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded-full font-semibold">Guest</span>
+            <button id="logoutBtn" class="ml-3 text-gray-400 hover:text-red-600 px-2 py-1 text-sm font-medium hidden transition-colors" title="Logout">
+              <i class="fas fa-sign-out-alt"></i>
             </button>
           </div>
         </div>
@@ -78,36 +130,34 @@
 
   <div class="flex h-screen bg-gray-50">
     <!-- Filter Sidebar -->
-    <div id="filterSidebar" class="sidebar fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg lg:relative lg:translate-x-0">
+    <div id="filterSidebar" class="sidebar fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl lg:relative lg:translate-x-0 transition-transform duration-300">
       <div class="flex items-center justify-between p-4 border-b">
-        <h2 class="text-lg font-medium text-gray-900">Filters</h2>
+        <h2 class="text-lg font-semibold text-indigo-700 flex items-center"><i class="fas fa-filter mr-2"></i>Filters</h2>
         <button id="closeSidebar" class="lg:hidden text-gray-400 hover:text-gray-600">
           <i class="fas fa-times"></i>
         </button>
       </div>
-      <div class="p-4 space-y-4">
+      <div class="p-4 space-y-3">
         <!-- Search -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-search text-gray-400"></i>
           <input id="searchInput" type="text" placeholder="Search incidents..." 
-                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                 class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
         </div>
-
         <!-- Status Filter -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-          <select id="statusFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-flag text-gray-400"></i>
+          <select id="statusFilter" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
             <option value="">All Statuses</option>
             <option value="OPEN">Open</option>
             <option value="ACKNOWLEDGED">Acknowledged</option>
             <option value="RESOLVED">Resolved</option>
           </select>
         </div>
-
         <!-- Priority Filter -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Priority</label>
-          <select id="priorityFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-exclamation-circle text-gray-400"></i>
+          <select id="priorityFilter" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
             <option value="">All Priorities</option>
             <option value="CRITICAL">Critical</option>
             <option value="HIGH">High</option>
@@ -115,11 +165,10 @@
             <option value="LOW">Low</option>
           </select>
         </div>
-
         <!-- Severity Filter -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Severity</label>
-          <select id="severityFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-bolt text-gray-400"></i>
+          <select id="severityFilter" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
             <option value="">All Severities</option>
             <option value="SEV0">SEV0</option>
             <option value="SEV1">SEV1</option>
@@ -128,22 +177,19 @@
             <option value="SEV3">SEV3</option>
           </select>
         </div>
-
         <!-- Tags Filter -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-tags text-gray-400"></i>
           <input id="tagsFilter" type="text" placeholder="Filter by tags..." 
-                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                 class="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
         </div>
-
         <!-- Apply Filters -->
-        <button id="applyFilters" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          Apply Filters
+        <button id="applyFilters" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold transition-colors">
+          <i class="fas fa-check mr-2"></i>Apply Filters
         </button>
-
         <!-- Clear Filters -->
-        <button id="clearFilters" class="w-full bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
-          Clear All
+        <button id="clearFilters" class="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 font-semibold transition-colors">
+          <i class="fas fa-eraser mr-2"></i>Clear All
         </button>
       </div>
     </div>
@@ -151,30 +197,30 @@
     <!-- Main Content -->
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- Toolbar -->
-      <div class="bg-white border-b px-6 py-4">
+      <div class="bg-white border-b px-6 py-4 shadow-sm">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
-            <button id="openSidebar" class="lg:hidden text-gray-500 hover:text-gray-700">
+            <button id="openSidebar" class="lg:hidden text-gray-500 hover:text-indigo-700 transition-colors p-2 rounded-lg hover:bg-gray-100">
               <i class="fas fa-filter"></i>
             </button>
-            <h2 class="text-lg font-medium text-gray-900">Incidents</h2>
-            <span id="incidentCount" class="text-sm text-gray-500">0 incidents</span>
+            <h2 class="text-xl font-bold text-gray-900">Incidents</h2>
+            <span id="incidentCount" class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">0 incidents</span>
           </div>
           <div class="flex items-center space-x-3">
             <!-- Bulk Actions -->
-            <div id="bulkActions" class="hidden flex items-center space-x-2">
-              <span class="text-sm text-gray-500">Selected: <span id="selectedCount">0</span></span>
-              <button id="bulkAssign" class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200">
+            <div id="bulkActions" class="hidden flex items-center space-x-2 bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
+              <span class="text-sm text-blue-700 font-medium">Selected: <span id="selectedCount">0</span></span>
+              <button id="bulkAssign" class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-md hover:bg-blue-200 transition-colors font-medium">
                 <i class="fas fa-user-plus mr-1"></i>Assign
               </button>
-              <button id="bulkTag" class="text-sm bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200">
+              <button id="bulkTag" class="text-sm bg-green-100 text-green-700 px-3 py-1 rounded-md hover:bg-green-200 transition-colors font-medium">
                 <i class="fas fa-tag mr-1"></i>Tag
               </button>
-              <button id="bulkClose" class="text-sm bg-red-100 text-red-700 px-3 py-1 rounded hover:bg-red-200">
+              <button id="bulkClose" class="text-sm bg-red-100 text-red-700 px-3 py-1 rounded-md hover:bg-red-200 transition-colors font-medium">
                 <i class="fas fa-times mr-1"></i>Close
               </button>
             </div>
-            <button id="createIncidentBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <button id="createIncidentBtn" class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-6 py-3 rounded-lg hover:from-indigo-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 font-semibold transition-all duration-200 transform hover:scale-105">
               <i class="fas fa-plus mr-2"></i>Create Incident
             </button>
           </div>
@@ -184,38 +230,38 @@
       <!-- Incident List -->
       <div class="flex-1 overflow-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div class="bg-white shadow overflow-hidden sm:rounded-md">
+          <div class="bg-white shadow-lg overflow-hidden sm:rounded-xl incident-table">
             <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+              <thead class="bg-gray-100">
                 <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="id">
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600 transition-colors" data-sort="id">
                     ID <i class="fas fa-sort ml-1"></i>
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="title">
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600 transition-colors" data-sort="title">
                     Title <i class="fas fa-sort ml-1"></i>
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="status">
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600 transition-colors" data-sort="status">
                     Status <i class="fas fa-sort ml-1"></i>
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="priority">
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600 transition-colors" data-sort="priority">
                     Priority <i class="fas fa-sort ml-1"></i>
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="severityLevel">
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600 transition-colors" data-sort="severityLevel">
                     Severity <i class="fas fa-sort ml-1"></i>
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Site
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Assigned To
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" data-sort="updatedAt">
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-indigo-600 transition-colors" data-sort="updatedAt">
                     Last Updated <i class="fas fa-sort ml-1"></i>
                   </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -231,77 +277,98 @@
   </div>
 
   <!-- Create/Edit Incident Modal -->
-  <div id="incidentModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+  <div id="incidentModal" class="modal fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 backdrop-blur-sm">
+    <div class="relative top-10 mx-auto p-8 border w-11/12 md:w-3/4 lg:w-2/3 shadow-2xl rounded-xl bg-gradient-to-br from-white to-gray-50 max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 opacity-0">
       <div class="mt-3">
-        <div class="flex items-center justify-between mb-4">
-          <h3 id="modalTitle" class="text-lg font-medium text-gray-900">Create Incident</h3>
-          <button id="closeModal" class="text-gray-400 hover:text-gray-600">
-            <i class="fas fa-times"></i>
+        <div class="flex items-center justify-between mb-6">
+          <h3 id="modalTitle" class="text-2xl font-bold text-gray-900">Create Incident</h3>
+          <button id="closeModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <i class="fas fa-times text-xl"></i>
           </button>
         </div>
         
-        <form id="incidentForm" class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form id="incidentForm" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-sm font-medium text-gray-700">Title *</label>
-              <input type="text" name="title" required 
-                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Title *</label>
+              <div class="relative">
+                <i class="fas fa-heading absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" name="title" required 
+                       class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+              </div>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Priority</label>
-              <select name="priority" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <option value="CRITICAL">Critical</option>
-                <option value="HIGH">High</option>
-                <option value="MEDIUM" selected>Medium</option>
-                <option value="LOW">Low</option>
-              </select>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Priority</label>
+              <div class="relative">
+                <i class="fas fa-exclamation-triangle absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <select name="priority" class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                  <option value="CRITICAL">Critical</option>
+                  <option value="HIGH">High</option>
+                  <option value="MEDIUM" selected>Medium</option>
+                  <option value="LOW">Low</option>
+                </select>
+              </div>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Severity Level</label>
-              <select name="severityLevel" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <option value="">Select Severity</option>
-                <option value="SEV0">SEV0</option>
-                <option value="SEV1">SEV1</option>
-                <option value="SEV1A">SEV1A</option>
-                <option value="SEV2">SEV2</option>
-                <option value="SEV3">SEV3</option>
-              </select>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Severity Level</label>
+              <div class="relative">
+                <i class="fas fa-bolt absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <select name="severityLevel" class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                  <option value="">Select Severity</option>
+                  <option value="SEV0">SEV0</option>
+                  <option value="SEV1">SEV1</option>
+                  <option value="SEV1A">SEV1A</option>
+                  <option value="SEV2">SEV2</option>
+                  <option value="SEV3">SEV3</option>
+                </select>
+              </div>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700">Fault Reported</label>
-              <input type="text" name="faultReported" 
-                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Fault Reported</label>
+              <div class="relative">
+                <i class="fas fa-bug absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" name="faultReported" 
+                       class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+              </div>
             </div>
           </div>
           
           <div>
-            <label class="block text-sm font-medium text-gray-700">Description</label>
-            <textarea name="description" rows="3" 
-                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Tags</label>
-              <input type="text" name="tags" placeholder="Enter tags separated by commas" 
-                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700">In Scope</label>
-              <select name="inScope" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-              </select>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+            <div class="relative">
+              <i class="fas fa-align-left absolute left-3 top-4 text-gray-400"></i>
+              <textarea name="description" rows="3" 
+                        class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"></textarea>
             </div>
           </div>
 
-          <div class="flex justify-end space-x-3 pt-4">
-            <button type="button" id="cancelModal" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Tags</label>
+              <div class="relative">
+                <i class="fas fa-tags absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" name="tags" placeholder="Enter tags separated by commas" 
+                       class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">In Scope</label>
+              <div class="relative">
+                <i class="fas fa-check-circle absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <select name="inScope" class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200">
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end space-x-4 pt-6">
+            <button type="button" id="cancelModal" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 font-semibold transition-all duration-200">
               Cancel
             </button>
-            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
-              Create Incident
+            <button type="submit" class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-6 py-3 rounded-lg hover:from-indigo-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 font-semibold transition-all duration-200 transform hover:scale-105">
+              <i class="fas fa-plus mr-2"></i>Create Incident
             </button>
           </div>
         </form>
@@ -310,28 +377,28 @@
   </div>
 
   <!-- Incident Detail Modal -->
-  <div id="detailModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-10 mx-auto p-5 border w-11/12 md:w-4/5 lg:w-3/4 shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">
+  <div id="detailModal" class="modal fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50 backdrop-blur-sm">
+    <div class="relative top-5 mx-auto p-8 border w-11/12 md:w-4/5 lg:w-3/4 shadow-2xl rounded-xl bg-gradient-to-br from-white to-gray-50 max-h-[95vh] overflow-y-auto transform transition-all duration-300 scale-95 opacity-0">
       <div class="mt-3">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-medium text-gray-900">Incident Details</h3>
-          <button id="closeDetailModal" class="text-gray-400 hover:text-gray-600">
-            <i class="fas fa-times"></i>
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-2xl font-bold text-gray-900">Incident Details</h3>
+          <button id="closeDetailModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <i class="fas fa-times text-xl"></i>
           </button>
         </div>
         
         <div id="incidentDetail" class="space-y-6">
           <!-- Header -->
-          <div class="bg-gray-50 p-4 rounded-lg">
+          <div class="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-xl border border-indigo-100">
             <div class="flex items-center justify-between">
-              <div>
-                <h4 id="detailTitle" class="text-xl font-semibold text-gray-900"></h4>
-                <p id="detailDescription" class="text-gray-600 mt-1"></p>
+              <div class="flex-1">
+                <h4 id="detailTitle" class="text-2xl font-bold text-gray-900 mb-2"></h4>
+                <p id="detailDescription" class="text-gray-600 text-lg"></p>
               </div>
-              <div class="flex items-center space-x-3">
-                <span id="detailStatus" class="px-3 py-1 rounded-full text-sm font-medium"></span>
-                <span id="detailPriority" class="px-3 py-1 rounded-full text-sm font-medium"></span>
-                <span id="detailSeverity" class="px-3 py-1 rounded-full text-sm font-medium"></span>
+              <div class="flex items-center space-x-3 ml-6">
+                <span id="detailStatus" class="px-4 py-2 rounded-full text-sm font-bold shadow-sm"></span>
+                <span id="detailPriority" class="px-4 py-2 rounded-full text-sm font-bold shadow-sm"></span>
+                <span id="detailSeverity" class="px-4 py-2 rounded-full text-sm font-bold shadow-sm"></span>
               </div>
             </div>
           </div>
@@ -339,14 +406,14 @@
           <!-- Tabs -->
           <div class="border-b border-gray-200">
             <nav class="-mb-px flex space-x-8">
-              <button class="tab-btn active border-indigo-500 text-indigo-600 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" data-tab="timeline">
-                Timeline
+              <button class="tab-btn active border-indigo-500 text-indigo-600 whitespace-nowrap py-3 px-1 border-b-2 font-semibold text-sm transition-colors" data-tab="timeline">
+                <i class="fas fa-clock mr-2"></i>Timeline
               </button>
-              <button class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" data-tab="details">
-                Details
+              <button class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-semibold text-sm transition-colors" data-tab="details">
+                <i class="fas fa-info-circle mr-2"></i>Details
               </button>
-              <button class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" data-tab="audit">
-                Audit Log
+              <button class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-3 px-1 border-b-2 font-semibold text-sm transition-colors" data-tab="audit">
+                <i class="fas fa-history mr-2"></i>Audit Log
               </button>
             </nav>
           </div>
@@ -355,9 +422,9 @@
           <div id="timelineTab" class="tab-content active">
             <div class="space-y-4">
               <div class="flex items-center justify-between">
-                <h5 class="text-lg font-medium text-gray-900">Timeline</h5>
-                <button id="addCommentBtn" class="bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700">
-                  Add Comment
+                <h5 class="text-xl font-bold text-gray-900">Timeline</h5>
+                <button id="addCommentBtn" class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-4 py-2 rounded-lg text-sm hover:from-indigo-700 hover:to-indigo-800 font-semibold transition-all duration-200 transform hover:scale-105">
+                  <i class="fas fa-plus mr-2"></i>Add Comment
                 </button>
               </div>
               <div id="timelineEvents" class="space-y-4">
@@ -367,39 +434,39 @@
           </div>
 
           <div id="detailsTab" class="tab-content">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h5 class="text-lg font-medium text-gray-900 mb-4">Root Cause & Actions</h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="bg-gray-50 p-6 rounded-xl">
+                <h5 class="text-xl font-bold text-gray-900 mb-4">Root Cause & Actions</h5>
                 <div class="space-y-4">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">Root Cause</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Root Cause</label>
                     <textarea id="rootCause" rows="3" 
-                              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"></textarea>
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">Action Taken</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Action Taken</label>
                     <textarea id="actionTaken" rows="3" 
-                              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"></textarea>
                   </div>
-                  <button id="saveDetails" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-                    Save Changes
+                  <button id="saveDetails" class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-800 font-semibold transition-all duration-200 transform hover:scale-105">
+                    <i class="fas fa-save mr-2"></i>Save Changes
                   </button>
                 </div>
               </div>
-              <div>
-                <h5 class="text-lg font-medium text-gray-900 mb-4">Related Entities</h5>
+              <div class="bg-gray-50 p-6 rounded-xl">
+                <h5 class="text-xl font-bold text-gray-900 mb-4">Related Entities</h5>
                 <div class="space-y-4">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">Customer</label>
-                    <p id="detailCustomer" class="text-gray-600"></p>
+                    <label class="block text-sm font-semibold text-gray-700">Customer</label>
+                    <p id="detailCustomer" class="text-gray-600 mt-1"></p>
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">Site</label>
-                    <p id="detailSite" class="text-gray-600"></p>
+                    <label class="block text-sm font-semibold text-gray-700">Site</label>
+                    <p id="detailSite" class="text-gray-600 mt-1"></p>
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700">Chargers</label>
-                    <div id="detailChargers" class="text-gray-600"></div>
+                    <label class="block text-sm font-semibold text-gray-700">Chargers</label>
+                    <div id="detailChargers" class="text-gray-600 mt-1"></div>
                   </div>
                 </div>
               </div>
@@ -407,9 +474,11 @@
           </div>
 
           <div id="auditTab" class="tab-content">
-            <h5 class="text-lg font-medium text-gray-900 mb-4">Audit Log</h5>
-            <div id="auditLog" class="space-y-2">
-              <!-- Audit log will be loaded here -->
+            <div class="bg-gray-50 p-6 rounded-xl">
+              <h5 class="text-xl font-bold text-gray-900 mb-4">Audit Log</h5>
+              <div id="auditLog" class="space-y-2">
+                <!-- Audit log will be loaded here -->
+              </div>
             </div>
           </div>
         </div>
@@ -621,35 +690,35 @@
     function renderIncidentTable() {
       const tbody = document.getElementById('incidentTableBody');
       tbody.innerHTML = incidents.map(incident => `
-        <tr class="hover:bg-gray-50">
+        <tr class="hover:bg-gray-50 transition-all duration-200 incident-table-row">
           <td class="px-6 py-4 whitespace-nowrap">
             <input type="checkbox" class="incident-checkbox rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" 
                    value="${incident.id}" ${selectedIncidents.has(incident.id) ? 'checked' : ''}>
           </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${incident.id.substring(0, 8)}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${incident.id.substring(0, 8)}</td>
           <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm font-medium text-gray-900 cursor-pointer hover:text-indigo-600" 
+            <div class="text-sm font-semibold text-gray-900 cursor-pointer hover:text-indigo-600 transition-colors" 
                  onclick="viewIncident('${incident.id}')">${incident.title}</div>
           </td>
           <td class="px-6 py-4 whitespace-nowrap">
-            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(incident.status)}">
+            <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full status-badge ${getStatusColor(incident.status)}">
               ${incident.status}
             </span>
           </td>
           <td class="px-6 py-4 whitespace-nowrap">
-            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getPriorityColor(incident.priority)}">
+            <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full status-badge ${getPriorityColor(incident.priority)}">
               ${incident.priority}
             </span>
           </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${incident.severityLevel || '-'}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${incident.site?.name || '-'}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${incident.assignedToId || '-'}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${incident.severityLevel || '-'}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${incident.site?.name || '-'}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${incident.assignedToId || '-'}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(incident.updatedAt)}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-            <button onclick="editIncident('${incident.id}')" class="text-indigo-600 hover:text-indigo-900 mr-3">
+            <button onclick="editIncident('${incident.id}')" class="btn-hover text-indigo-600 hover:text-indigo-900 mr-3 p-2 rounded-lg hover:bg-indigo-50 transition-all duration-200" title="Edit">
               <i class="fas fa-edit"></i>
             </button>
-            <button onclick="viewIncident('${incident.id}')" class="text-green-600 hover:text-green-900">
+            <button onclick="viewIncident('${incident.id}')" class="btn-hover text-green-600 hover:text-green-900 p-2 rounded-lg hover:bg-green-50 transition-all duration-200" title="View Details">
               <i class="fas fa-eye"></i>
             </button>
           </td>
@@ -805,11 +874,11 @@
       document.getElementById('detailTitle').textContent = incident.title;
       document.getElementById('detailDescription').textContent = incident.description || '';
       document.getElementById('detailStatus').textContent = incident.status;
-      document.getElementById('detailStatus').className = `px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(incident.status)}`;
+      document.getElementById('detailStatus').className = `px-4 py-2 rounded-full text-sm font-bold shadow-sm ${getStatusColor(incident.status)}`;
       document.getElementById('detailPriority').textContent = incident.priority;
-      document.getElementById('detailPriority').className = `px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(incident.priority)}`;
+      document.getElementById('detailPriority').className = `px-4 py-2 rounded-full text-sm font-bold shadow-sm ${getPriorityColor(incident.priority)}`;
       document.getElementById('detailSeverity').textContent = incident.severityLevel || '-';
-      document.getElementById('detailSeverity').className = `px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800`;
+      document.getElementById('detailSeverity').className = `px-4 py-2 rounded-full text-sm font-bold shadow-sm bg-gray-100 text-gray-800`;
       
       document.getElementById('rootCause').value = incident.rootCause || '';
       document.getElementById('actionTaken').value = incident.actionTaken || '';
@@ -828,334 +897,10 @@
         <div class="border-l-4 border-indigo-500 pl-4 py-2">
           <div class="flex items-center justify-between">
             <div class="text-sm text-gray-900">${event.type === 'comment' ? event.payload.text : `Status changed to ${event.payload.status}`}</div>
-            <div class="text-xs text-gray-500">${formatDate(event.createdAt)}</div>
           </div>
         </div>
       `).join('');
     }
-
-    function switchTab(tabName) {
-      // Update tab buttons
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active', 'border-indigo-500', 'text-indigo-600');
-        btn.classList.add('border-transparent', 'text-gray-500');
-      });
-      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active', 'border-indigo-500', 'text-indigo-600');
-      document.querySelector(`[data-tab="${tabName}"]`).classList.remove('border-transparent', 'text-gray-500');
-
-      // Update tab content
-      document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-      });
-      document.getElementById(`${tabName}Tab`).classList.add('active');
-    }
-
-    function applyFilters() {
-      currentFilters = {
-        search: document.getElementById('searchInput').value,
-        status: document.getElementById('statusFilter').value,
-        priority: document.getElementById('priorityFilter').value,
-        severityLevel: document.getElementById('severityFilter').value,
-        tags: document.getElementById('tagsFilter').value
-      };
-      loadIncidents();
-    }
-
-    function clearFilters() {
-      document.getElementById('searchInput').value = '';
-      document.getElementById('statusFilter').value = '';
-      document.getElementById('priorityFilter').value = '';
-      document.getElementById('severityFilter').value = '';
-      document.getElementById('tagsFilter').value = '';
-      currentFilters = {};
-      loadIncidents();
-    }
-
-    function sortIncidents(field) {
-      if (currentSort.field === field) {
-        currentSort.order = currentSort.order === 'asc' ? 'desc' : 'asc';
-      } else {
-        currentSort.field = field;
-        currentSort.order = 'desc';
-      }
-      loadIncidents();
-    }
-
-    async function bulkAssign() {
-      if (!authManager.isAuthenticated()) {
-        showLoginModal();
-        return;
-      }
-
-      const assignedToId = prompt('Enter user ID to assign incidents to:');
-      if (!assignedToId) return;
-
-      try {
-        const response = await authManager.apiRequest('/api/incidents/bulk', {
-          method: 'POST',
-          body: JSON.stringify({
-            ids: Array.from(selectedIncidents),
-            action: 'assign',
-            assignedToId
-          })
-        });
-
-        if (!response.ok) {
-          if (response.status === 403) {
-            showNotification('Insufficient permissions to assign incidents', 'error');
-          } else {
-            throw new Error('Failed to assign incidents');
-          }
-          return;
-        }
-        
-        showNotification('Incidents assigned successfully', 'success');
-        selectedIncidents.clear();
-        loadIncidents();
-      } catch (error) {
-        console.error('Error assigning incidents:', error);
-        if (error.message === 'Authentication required') {
-          showLoginModal();
-        } else {
-          showNotification('Error assigning incidents', 'error');
-        }
-      }
-    }
-
-    async function bulkTag() {
-      if (!authManager.isAuthenticated()) {
-        showLoginModal();
-        return;
-      }
-
-      const tags = prompt('Enter tags (comma-separated):');
-      if (!tags) return;
-
-      try {
-        const response = await authManager.apiRequest('/api/incidents/bulk', {
-          method: 'POST',
-          body: JSON.stringify({
-            ids: Array.from(selectedIncidents),
-            action: 'tag',
-            tags: tags.split(',').map(t => t.trim())
-          })
-        });
-
-        if (!response.ok) {
-          if (response.status === 403) {
-            showNotification('Insufficient permissions to tag incidents', 'error');
-          } else {
-            throw new Error('Failed to tag incidents');
-          }
-          return;
-        }
-        
-        showNotification('Incidents tagged successfully', 'success');
-        selectedIncidents.clear();
-        loadIncidents();
-      } catch (error) {
-        console.error('Error tagging incidents:', error);
-        if (error.message === 'Authentication required') {
-          showLoginModal();
-        } else {
-          showNotification('Error tagging incidents', 'error');
-        }
-      }
-    }
-
-    async function bulkClose() {
-      if (!authManager.isAuthenticated()) {
-        showLoginModal();
-        return;
-      }
-
-      if (!confirm('Are you sure you want to close the selected incidents?')) return;
-
-      try {
-        const response = await authManager.apiRequest('/api/incidents/bulk', {
-          method: 'POST',
-          body: JSON.stringify({
-            ids: Array.from(selectedIncidents),
-            action: 'close'
-          })
-        });
-
-        if (!response.ok) {
-          if (response.status === 403) {
-            showNotification('Insufficient permissions to close incidents', 'error');
-          } else {
-            throw new Error('Failed to close incidents');
-          }
-          return;
-        }
-        
-        showNotification('Incidents closed successfully', 'success');
-        selectedIncidents.clear();
-        loadIncidents();
-      } catch (error) {
-        console.error('Error closing incidents:', error);
-        if (error.message === 'Authentication required') {
-          showLoginModal();
-        } else {
-          showNotification('Error closing incidents', 'error');
-        }
-      }
-    }
-
-    function showNotification(message, type) {
-      // Simple notification - in a real app, use a proper notification library
-      alert(`${type.toUpperCase()}: ${message}`);
-    }
-
-    function editIncident(id) {
-      // For now, just view the incident - edit functionality can be added later
-      viewIncident(id);
-    }
-
-    // Debug function to test authentication
-    async function debugAuth() {
-      try {
-        const response = await fetch('/api/debug/auth', {
-          headers: authManager.getAuthHeaders()
-        });
-        
-        const debugInfo = await response.json();
-        console.log('🔍 Auth Debug Info:', debugInfo);
-        
-        let message = 'Auth Debug Info:\n';
-        message += `Header: ${debugInfo.hasHeader}\n`;
-        message += `Token: ${debugInfo.hasToken}\n`;
-        message += `JWT Secret: ${debugInfo.hasJwtSecret}\n`;
-        
-        if (debugInfo.decoded) {
-          message += `User ID: ${debugInfo.decoded.sub}\n`;
-          message += `Email: ${debugInfo.decoded.email}\n`;
-          message += `Role: ${debugInfo.decoded.role}\n`;
-          message += `Expired: ${debugInfo.decoded.isExpired}\n`;
-        }
-        
-        if (debugInfo.jwtError) {
-          message += `JWT Error: ${debugInfo.jwtError}\n`;
-        }
-        
-        alert(message);
-      } catch (error) {
-        console.error('Debug auth error:', error);
-        alert('Debug failed: ' + error.message);
-      }
-    }
-
-    // Make debug function available globally
-    window.debugAuth = debugAuth;
-
-    // Simple function to test auth debug endpoint
-    async function testAuthDebug() {
-      try {
-        const response = await fetch('/api/debug/auth', {
-          headers: authManager.getAuthHeaders()
-        });
-        
-        const debugInfo = await response.json();
-        console.log('🔍 Auth Debug Info:', debugInfo);
-        
-        let message = 'Auth Debug Info:\n';
-        message += `Header: ${debugInfo.hasHeader}\n`;
-        message += `Token: ${debugInfo.hasToken}\n`;
-        message += `JWT Secret: ${debugInfo.hasJwtSecret}\n`;
-        
-        if (debugInfo.decoded) {
-          message += `User ID: ${debugInfo.decoded.sub}\n`;
-          message += `Email: ${debugInfo.decoded.email}\n`;
-          message += `Role: ${debugInfo.decoded.role}\n`;
-          message += `Expired: ${debugInfo.decoded.isExpired}\n`;
-        }
-        
-        if (debugInfo.jwtError) {
-          message += `JWT Error: ${debugInfo.jwtError}\n`;
-        }
-        
-        alert(message);
-      } catch (error) {
-        console.error('Test auth debug error:', error);
-        alert('Test failed: ' + error.message);
-      }
-    }
-
-    // Make test function available globally
-    window.testAuthDebug = testAuthDebug;
-
-    // Function to test database connection
-    async function testDatabase() {
-      try {
-        const response = await fetch('/api/debug/db');
-        
-        const debugInfo = await response.json();
-        console.log('🔍 Database Debug Info:', debugInfo);
-        
-        let message = 'Database Debug Info:\n';
-        message += `Prisma: ${debugInfo.hasPrisma}\n`;
-        message += `Database URL: ${debugInfo.hasDatabaseUrl}\n`;
-        message += `Connection: ${debugInfo.connection || 'unknown'}\n`;
-        
-        if (debugInfo.incidentTable) {
-          message += `Incident Table: ${debugInfo.incidentTable}\n`;
-          if (debugInfo.incidentCount !== undefined) {
-            message += `Incident Count: ${debugInfo.incidentCount}\n`;
-          }
-        }
-        
-        if (debugInfo.customerTable) {
-          message += `Customer Table: ${debugInfo.customerTable}\n`;
-          if (debugInfo.customerCount !== undefined) {
-            message += `Customer Count: ${debugInfo.customerCount}\n`;
-          }
-        }
-        
-        if (debugInfo.connectionError) {
-          message += `Connection Error: ${debugInfo.connectionError}\n`;
-        }
-        
-        if (debugInfo.incidentError) {
-          message += `Incident Table Error: ${debugInfo.incidentError}\n`;
-        }
-        
-        alert(message);
-      } catch (error) {
-        console.error('Test database error:', error);
-        alert('Test failed: ' + error.message);
-      }
-    }
-
-    // Make database test function available globally
-    window.testDatabase = testDatabase;
-
-    // Function to test incidents endpoint
-    async function testIncidents() {
-      try {
-        console.log('🧪 Testing incidents endpoint...');
-        
-        // Test with valid sort field
-        const response = await fetch('/api/incidents?sortBy=severityLevel&sortOrder=desc', {
-          headers: authManager.getAuthHeaders()
-        });
-        
-        if (response.ok) {
-          const incidents = await response.json();
-          console.log(`✅ Incidents endpoint works! Found ${incidents.length} incidents`);
-          alert(`✅ Incidents endpoint works!\nFound ${incidents.length} incidents`);
-        } else {
-          const error = await response.json();
-          console.error('❌ Incidents endpoint failed:', error);
-          alert(`❌ Incidents endpoint failed:\n${error.error || 'Unknown error'}`);
-        }
-      } catch (error) {
-        console.error('❌ Test incidents error:', error);
-        alert('Test failed: ' + error.message);
-      }
-    }
-
-    // Make incidents test function available globally
-    window.testIncidents = testIncidents;
   </script>
 </body>
 </html>
