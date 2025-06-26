@@ -82,7 +82,7 @@ class AuthManager {
   }
 
   // Refresh token
-  async refreshToken() {
+  async refreshAuthToken() {
     if (!this.refreshToken) return false;
     
     try {
@@ -121,7 +121,7 @@ class AuthManager {
 
     if (response.status === 401) {
       // Token might be expired, try to refresh
-      const refreshed = await this.refreshToken();
+      const refreshed = await this.refreshAuthToken();
       if (refreshed) {
         // Retry the request with new token
         const newHeaders = this.getAuthHeaders();

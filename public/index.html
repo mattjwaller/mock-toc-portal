@@ -417,9 +417,8 @@
     </div>
   </div>
 
-  <script src="config.js"></script>
   <script src="auth.js"></script>
-  <script src="../scripts/setup-user-roles.js"></script>
+  <script src="config.js"></script>
   <script>
     // Global state
     let incidents = [];
@@ -1012,6 +1011,120 @@
       // For now, just view the incident - edit functionality can be added later
       viewIncident(id);
     }
+
+    // Debug function to test authentication
+    async function debugAuth() {
+      try {
+        const response = await fetch('/api/debug/auth', {
+          headers: authManager.getAuthHeaders()
+        });
+        
+        const debugInfo = await response.json();
+        console.log('🔍 Auth Debug Info:', debugInfo);
+        
+        let message = 'Auth Debug Info:\n';
+        message += `Header: ${debugInfo.hasHeader}\n`;
+        message += `Token: ${debugInfo.hasToken}\n`;
+        message += `JWT Secret: ${debugInfo.hasJwtSecret}\n`;
+        
+        if (debugInfo.decoded) {
+          message += `User ID: ${debugInfo.decoded.sub}\n`;
+          message += `Email: ${debugInfo.decoded.email}\n`;
+          message += `Role: ${debugInfo.decoded.role}\n`;
+          message += `Expired: ${debugInfo.decoded.isExpired}\n`;
+        }
+        
+        if (debugInfo.jwtError) {
+          message += `JWT Error: ${debugInfo.jwtError}\n`;
+        }
+        
+        alert(message);
+      } catch (error) {
+        console.error('Debug auth error:', error);
+        alert('Debug failed: ' + error.message);
+      }
+    }
+
+    // Make debug function available globally
+    window.debugAuth = debugAuth;
+
+    // User role management functions
+    async function setCurrentUserRole(role) {
+      if (!authManager.isAuthenticated()) {
+        alert('Please log in first');
+        return false;
+      }
+
+      const user = authManager.getCurrentUser();
+      console.log(`🔄 Setting role for current user (${user.email}) to ${role}...`);
+      
+      try {
+        const response = await fetch(`${getConfig('SUPABASE_URL')}/rest/v1/auth/users/${user.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': getConfig('SUPABASE_ANON_KEY'),
+            'Authorization': `Bearer ${authManager.token}`
+          },
+          body: JSON.stringify({
+            user_metadata: { role: role }
+          })
+        });
+
+        if (response.ok) {
+          console.log(`✅ User ${user.id} role set to ${role}`);
+          alert(`Role set to ${role} successfully! Please refresh the page.`);
+          return true;
+        } else {
+          console.error(`❌ Failed to set role for user ${user.id}:`, await response.text());
+          alert('Failed to set role. Check console for details.');
+          return false;
+        }
+      } catch (error) {
+        console.error(`❌ Error setting role for user ${user.id}:`, error);
+        alert('Error setting role: ' + error.message);
+        return false;
+      }
+    }
+
+    // Make role function available globally
+    window.setCurrentUserRole = setCurrentUserRole;
+
+    // Simple function to test auth debug endpoint
+    async function testAuthDebug() {
+      try {
+        const response = await fetch('/api/debug/auth', {
+          headers: authManager.getAuthHeaders()
+        });
+        
+        const debugInfo = await response.json();
+        console.log('🔍 Auth Debug Info:', debugInfo);
+        
+        let message = 'Auth Debug Info:\n';
+        message += `Header: ${debugInfo.hasHeader}\n`;
+        message += `Token: ${debugInfo.hasToken}\n`;
+        message += `JWT Secret: ${debugInfo.hasJwtSecret}\n`;
+        
+        if (debugInfo.decoded) {
+          message += `User ID: ${debugInfo.decoded.sub}\n`;
+          message += `Email: ${debugInfo.decoded.email}\n`;
+          message += `Role: ${debugInfo.decoded.role}\n`;
+          message += `Expired: ${debugInfo.decoded.isExpired}\n`;
+        }
+        
+        if (debugInfo.jwtError) {
+          message += `JWT Error: ${debugInfo.jwtError}\n`;
+        }
+        
+        alert(message);
+      } catch (error) {
+        console.error('Test auth debug error:', error);
+        alert('Test failed: ' + error.message);
+      }
+    }
+
+    // Make test function available globally
+    window.testAuthDebug = testAuthDebug;
   </script>
 </body>
 </html>
