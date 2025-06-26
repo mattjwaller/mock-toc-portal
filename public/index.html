@@ -419,6 +419,7 @@
 
   <script src="config.js"></script>
   <script src="auth.js"></script>
+  <script src="../scripts/setup-user-roles.js"></script>
   <script>
     // Global state
     let incidents = [];
@@ -594,24 +595,27 @@
         params.set('sortBy', currentSort.field);
         params.set('sortOrder', currentSort.order);
 
-        const response = await fetch(`/api/incidents?${params.toString()}`, {
-          headers: authManager.getAuthHeaders()
-        });
+        const response = await authManager.apiRequest(`/api/incidents?${params.toString()}`);
         
-        if (response.status === 401) {
-          // Token expired or invalid
-          authManager.logout();
+        if (!response.ok) {
+          if (response.status === 403) {
+            showNotification('Insufficient permissions to view incidents', 'error');
+          } else {
+            throw new Error('Failed to load incidents');
+          }
           return;
         }
-        
-        if (!response.ok) throw new Error('Failed to load incidents');
         
         incidents = await response.json();
         renderIncidentTable();
         updateIncidentCount();
       } catch (error) {
         console.error('Error loading incidents:', error);
-        showNotification('Error loading incidents', 'error');
+        if (error.message === 'Authentication required') {
+          showLoginModal();
+        } else {
+          showNotification('Error loading incidents', 'error');
+        }
       }
     }
 
@@ -740,25 +744,30 @@
       };
 
       try {
-        const response = await fetch('/api/incidents', {
+        const response = await authManager.apiRequest('/api/incidents', {
           method: 'POST',
-          headers: authManager.getAuthHeaders(),
           body: JSON.stringify(data)
         });
 
-        if (response.status === 401) {
-          authManager.logout();
+        if (!response.ok) {
+          if (response.status === 403) {
+            showNotification('Insufficient permissions to create incidents', 'error');
+          } else {
+            throw new Error('Failed to create incident');
+          }
           return;
         }
-
-        if (!response.ok) throw new Error('Failed to create incident');
         
         document.getElementById('incidentModal').classList.remove('active');
         showNotification('Incident created successfully', 'success');
         loadIncidents();
       } catch (error) {
         console.error('Error creating incident:', error);
-        showNotification('Error creating incident', 'error');
+        if (error.message === 'Authentication required') {
+          showLoginModal();
+        } else {
+          showNotification('Error creating incident', 'error');
+        }
       }
     }
 
@@ -769,23 +778,27 @@
       }
 
       try {
-        const response = await fetch(`/api/incidents/${id}`, {
-          headers: authManager.getAuthHeaders()
-        });
+        const response = await authManager.apiRequest(`/api/incidents/${id}`);
         
-        if (response.status === 401) {
-          authManager.logout();
+        if (!response.ok) {
+          if (response.status === 403) {
+            showNotification('Insufficient permissions to view incident details', 'error');
+          } else {
+            throw new Error('Failed to load incident');
+          }
           return;
         }
-        
-        if (!response.ok) throw new Error('Failed to load incident');
         
         const incident = await response.json();
         populateIncidentDetail(incident);
         document.getElementById('detailModal').classList.add('active');
       } catch (error) {
         console.error('Error loading incident:', error);
-        showNotification('Error loading incident details', 'error');
+        if (error.message === 'Authentication required') {
+          showLoginModal();
+        } else {
+          showNotification('Error loading incident details', 'error');
+        }
       }
     }
 
@@ -879,9 +892,8 @@
       if (!assignedToId) return;
 
       try {
-        const response = await fetch('/api/incidents/bulk', {
+        const response = await authManager.apiRequest('/api/incidents/bulk', {
           method: 'POST',
-          headers: authManager.getAuthHeaders(),
           body: JSON.stringify({
             ids: Array.from(selectedIncidents),
             action: 'assign',
@@ -889,19 +901,25 @@
           })
         });
 
-        if (response.status === 401) {
-          authManager.logout();
+        if (!response.ok) {
+          if (response.status === 403) {
+            showNotification('Insufficient permissions to assign incidents', 'error');
+          } else {
+            throw new Error('Failed to assign incidents');
+          }
           return;
         }
-
-        if (!response.ok) throw new Error('Failed to assign incidents');
         
         showNotification('Incidents assigned successfully', 'success');
         selectedIncidents.clear();
         loadIncidents();
       } catch (error) {
         console.error('Error assigning incidents:', error);
-        showNotification('Error assigning incidents', 'error');
+        if (error.message === 'Authentication required') {
+          showLoginModal();
+        } else {
+          showNotification('Error assigning incidents', 'error');
+        }
       }
     }
 
@@ -915,9 +933,8 @@
       if (!tags) return;
 
       try {
-        const response = await fetch('/api/incidents/bulk', {
+        const response = await authManager.apiRequest('/api/incidents/bulk', {
           method: 'POST',
-          headers: authManager.getAuthHeaders(),
           body: JSON.stringify({
             ids: Array.from(selectedIncidents),
             action: 'tag',
@@ -925,19 +942,25 @@
           })
         });
 
-        if (response.status === 401) {
-          authManager.logout();
+        if (!response.ok) {
+          if (response.status === 403) {
+            showNotification('Insufficient permissions to tag incidents', 'error');
+          } else {
+            throw new Error('Failed to tag incidents');
+          }
           return;
         }
-
-        if (!response.ok) throw new Error('Failed to tag incidents');
         
         showNotification('Incidents tagged successfully', 'success');
         selectedIncidents.clear();
         loadIncidents();
       } catch (error) {
         console.error('Error tagging incidents:', error);
-        showNotification('Error tagging incidents', 'error');
+        if (error.message === 'Authentication required') {
+          showLoginModal();
+        } else {
+          showNotification('Error tagging incidents', 'error');
+        }
       }
     }
 
@@ -950,28 +973,33 @@
       if (!confirm('Are you sure you want to close the selected incidents?')) return;
 
       try {
-        const response = await fetch('/api/incidents/bulk', {
+        const response = await authManager.apiRequest('/api/incidents/bulk', {
           method: 'POST',
-          headers: authManager.getAuthHeaders(),
           body: JSON.stringify({
             ids: Array.from(selectedIncidents),
             action: 'close'
           })
         });
 
-        if (response.status === 401) {
-          authManager.logout();
+        if (!response.ok) {
+          if (response.status === 403) {
+            showNotification('Insufficient permissions to close incidents', 'error');
+          } else {
+            throw new Error('Failed to close incidents');
+          }
           return;
         }
-
-        if (!response.ok) throw new Error('Failed to close incidents');
         
         showNotification('Incidents closed successfully', 'success');
         selectedIncidents.clear();
         loadIncidents();
       } catch (error) {
         console.error('Error closing incidents:', error);
-        showNotification('Error closing incidents', 'error');
+        if (error.message === 'Authentication required') {
+          showLoginModal();
+        } else {
+          showNotification('Error closing incidents', 'error');
+        }
       }
     }
 
