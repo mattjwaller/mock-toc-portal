@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import incidentsRouter from './api/incidents.js';
 import webhooksRouter from './api/webhooks.js';
 import supportingRouter from './api/supporting.js';
+import configRouter from './api/config.js';
 import promClient from 'prom-client';
 import { authMiddleware } from './auth.js';
 
@@ -25,6 +26,9 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use(express.static('public'));
+
+// Public endpoints (no auth required)
+app.use('/api', configRouter());
 
 // Webhook endpoints (no auth required)
 app.use('/webhooks', webhooksRouter(prisma));
