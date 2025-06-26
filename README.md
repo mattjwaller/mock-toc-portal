@@ -53,25 +53,20 @@ npm install
 
 ### 2. Environment Setup
 
-Copy the example environment file and configure your settings:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` with your configuration:
+Create a `.env` file with your configuration:
 
 ```env
-# Server
-PORT=8080
-NODE_ENV=development
-
 # Database
-DATABASE_URL=postgresql://user:pass@host:port/db
+DATABASE_URL="postgresql://username:password@localhost:5432/toc_portal"
 
-# Authentication
-SUPABASE_JWT_SECRET=your-supabase-jwt-secret
-SUPABASE_URL=https://your-project.supabase.co
+# Supabase Authentication
+SUPABASE_URL="https://your-project.supabase.co"
+SUPABASE_ANON_KEY="your-supabase-anon-key"
+SUPABASE_JWT_SECRET="your-supabase-jwt-secret"
+
+# Application
+PORT=8080
+GOTRUE_SITE_URL="http://localhost:8080"
 ```
 
 ### 3. Database Setup
@@ -81,10 +76,10 @@ SUPABASE_URL=https://your-project.supabase.co
 npx prisma generate
 
 # Run database migrations
-npx prisma migrate dev
+npm run migrate:dev
 
 # Seed the database with sample data
-npm run seed
+npm run db:seed
 ```
 
 ### 4. Start Development Server
@@ -94,6 +89,48 @@ npm run dev
 ```
 
 The application will be available at `http://localhost:8080`
+
+## 🌐 Railway Deployment
+
+### 1. Deploy to Railway
+
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
+
+# Login and link your project
+railway login
+railway link
+
+# Deploy
+railway up
+```
+
+### 2. Set Environment Variables
+
+In your Railway dashboard, set these environment variables:
+
+```env
+DATABASE_URL=postgresql://...  # Railway provides this automatically
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_JWT_SECRET=your-supabase-jwt-secret
+GOTRUE_SITE_URL=https://your-app-name.up.railway.app
+```
+
+### 3. Database Migration
+
+Railway will automatically run migrations on deployment. If you need to run them manually:
+
+```bash
+railway run npm run migrate
+```
+
+### 4. Seed Database (Optional)
+
+```bash
+railway run npm run db:seed
+```
 
 ## 📚 API Documentation
 
